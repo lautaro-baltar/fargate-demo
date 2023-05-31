@@ -1,0 +1,32 @@
+version: '3'
+services:
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    environment:
+      - REACT_APP_BACKEND_URL=http://localhost:8000
+    depends_on:
+      - backend
+  backend:
+    container_name: backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - 8000:8000
+    environment:
+      - MONGO_URI=<MONGO_URI>
+  locust:
+    container_name: locust
+    image: locustio/locust
+    ports:
+      - "8089:8089"
+    volumes:
+      - ./stress-test/:/mnt/locust
+    command: -f /mnt/locust/locustfile.py
+    depends_on:
+     - backend
